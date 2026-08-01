@@ -1,102 +1,133 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import authService from './services/authService'
-import { login, logout } from './store/authSlice'
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
-// Core Layout Wrappers
-import Header from './components/Header/Header'
-import Footer from './components/Footer/Footer'
+import authService from "./services/authService";
+import { login, logout } from "./store/authSlice";
 
-// Core Page Components
-import Home from './components/Home/Home'
-import Places from './components/Places/Places'
-import HotelsVendors from './components/HotelsVendors/HotelsVendors'
-import Menu from './components/Menu/Menu'
-import Contact from './components/Contact/Contact'
-import Profile from './components/Profile/Profile'
-import GovDashBoard from './components/GovDashBoard/GovDashBoard'
+// Layout
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
 
-// Auth Components
-import Login from './components/Login'
-import Signup from './components/Signup'
+// Pages
+import Home from "./components/Home/Home";
+import Places from "./components/Places/Places";
+import HotelsVendors from "./components/HotelsVendors/HotelsVendors";
+import Menu from "./components/Menu/Menu";
+import Contact from "./components/Contact/Contact";
+import Profile from "./components/Profile/Profile";
+import GovDashBoard from "./components/GovDashBoard/GovDashBoard";
+import BookYatra from "./components/BookYatra/BookYatra";
+import MyBookings from "./components/MyBookings/MyBookings";
 
-// Global Floating ChatBot
-import ChatBot from './components/ChatBot/ChatBot'
-import { useChatAPI } from './hooks/useChatAPI'
+// Auth
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+
+// Chatbot
+import ChatBot from "./components/ChatBot/ChatBot";
+import { useChatAPI } from "./hooks/useChatAPI";
 
 function App() {
-  const [loading, setLoading] = useState(true)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
-  // RAG chatbot state — shared across all routes
-  const { messages, isLoading: chatLoading, sendMessage } = useChatAPI()
+  // Chatbot state
+  const {
+    messages,
+    isLoading: chatLoading,
+    sendMessage,
+  } = useChatAPI();
 
   useEffect(() => {
-    // Check auth status on app load via Appwrite
-    authService.getCurrentUser()
-      .then((userData) => {
-        if (userData) {
-          dispatch(login({ userData }))
-        } else {
-          dispatch(logout())
+    const checkUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          dispatch(logout());
+          return;
         }
-      })
-      .catch((error) => {
-        console.log("No active session found (User is a guest)");
-        dispatch(logout())
-      })
-      .finally(() => setLoading(false))
-  }, [dispatch])
+
+        const userData = await authService.getCurrentUser();
+
+        if (userData) {
+          // ✅ Store actual user object
+          dispatch(login(userData));
+        } else {
+          dispatch(logout());
+        }
+      } catch (error) {
+        console.log("No active session:", error);
+        dispatch(logout());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+  }, [dispatch]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f4fbf7] flex items-center justify-center">
-        <div className="animate-pulse text-[#1b3d2b] font-serif text-xl tracking-wide">
+        <div className="animate-pulse text-[#1b3d2b] text-xl font-serif">
           Loading Uttarakhand Unlocked...
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen font-sans bg-[#f4fbf7] text-gray-800">
+      <div className="flex flex-col min-h-screen bg-[#f4fbf7] text-gray-800">
+
         <Header />
-        
+
         <main className="flex-grow">
           <Routes>
-            {/* Main Public Flow Pages */}
+
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/places" element={<Places />} />
             <Route path="/hotels" element={<HotelsVendors />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/book-yatra" element={<BookYatra />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
 
-            {/* Account & Security Views */}
+            {/* Authentication */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+
+            {/* User */}
             <Route path="/profile" element={<Profile />} />
 
-            {/* Management Admin Dashboard */}
+            {/* Admin */}
             <Route path="/dashboard" element={<GovDashBoard />} />
-            
-            {/* Catch-all Routing Strategy (Always keep at the absolute bottom) */}
+
+            {/* Unknown Routes */}
             <Route path="*" element={<Navigate to="/" replace />} />
+
           </Routes>
         </main>
 
         <Footer />
 
-        {/* Floating AI chatbot — persists across all routes, wired to RAG backend */}
         <ChatBot
           messages={messages}
           onSubmit={sendMessage}
           isLoading={chatLoading}
         />
+
       </div>
     </Router>
-  )
+  );
 }
 
 export default App;

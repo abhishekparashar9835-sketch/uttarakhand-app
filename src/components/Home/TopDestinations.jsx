@@ -2,7 +2,7 @@ import React from 'react';
 // Import your local destination thumbnail images here
 const rishikesh = "https://images.travelandleisureasia.com/wp-content/uploads/sites/2/2025/03/24142827/Places-to-visit-in-Rishikesh-FI.jpg";
 const jimCorbettImg = "https://wildlifenavigator.com/wp-content/uploads/2024/09/jim-corbett-national-park.webp"
-const masoorie = "https://www.worldatlas.com/r/w1200-q80/upload/1f/90/31/shutterstock-794720590.jpg"
+const masoorie = "https://th.bing.com/th/id/OIP.IJUgDKZdB3T8V4RrHwXwzgHaFj?r=0&o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3"
 const devprayag = "https://th.bing.com/th/id/OIP.IJUgDKZdB3T8V4RrHwXwzgHaFj?r=0&o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3"
 const kedarnath = "https://tse4.mm.bing.net/th/id/OIP.YQj2Themksw6bpGPlkLShQHaFw?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
 

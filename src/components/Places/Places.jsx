@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import placeService from "../../services/placeService";
 
 // ================= Place Card =================
@@ -10,6 +11,7 @@ const PlaceCard = ({
   elevation,
   description,
   tags,
+  navigate,
 }) => {
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
@@ -37,12 +39,12 @@ const PlaceCard = ({
       </div>
 
       {/* Content */}
-      <div className="p-6 flex flex-col flex-grow space-y-3">
-        <h3 className="text-2xl font-serif text-[#1b3d2b]">
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="text-2xl font-serif text-[#1b3d2b] mb-3">
           {title}
         </h3>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500">
+        <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
           <span>📍 {location}</span>
           <span>🏔️ {elevation || "N/A"}</span>
         </div>
@@ -51,7 +53,7 @@ const PlaceCard = ({
           {description}
         </p>
 
-        <div className="flex flex-wrap gap-2 pt-2">
+        <div className="flex flex-wrap gap-2 mt-4">
           {(tags || []).map((tag, index) => (
             <span
               key={index}
@@ -61,6 +63,16 @@ const PlaceCard = ({
             </span>
           ))}
         </div>
+
+        {/* Book Button */}
+        <button
+          onClick={() =>
+            navigate(`/book-yatra?place=${encodeURIComponent(title)}`)
+          }
+          className="mt-6 bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-lg font-semibold transition duration-300"
+        >
+          Book Now
+        </button>
       </div>
     </div>
   );
@@ -68,6 +80,8 @@ const PlaceCard = ({
 
 // ================= Places Page =================
 function Places() {
+  const navigate = useNavigate();
+
   const [placesData, setPlacesData] = useState([]);
   const [activeFilter, setActiveFilter] = useState("All Places");
   const [loading, setLoading] = useState(true);
@@ -133,7 +147,6 @@ function Places() {
       {/* Places */}
       <section className="bg-[#f4fbf7] py-16 px-6">
         <div className="max-w-7xl mx-auto">
-
           {/* Filter Buttons */}
           <div className="flex justify-center gap-4 mb-12">
             {[
@@ -147,7 +160,7 @@ function Places() {
                 className={`px-6 py-2 rounded-full border transition ${
                   activeFilter === filter
                     ? "bg-[#1b3d2b] text-white"
-                    : "bg-white"
+                    : "bg-white hover:bg-gray-100"
                 }`}
               >
                 {filter}
@@ -175,6 +188,7 @@ function Places() {
                   elevation={place.elevation}
                   description={place.description}
                   tags={place.tags}
+                  navigate={navigate}
                 />
               ))}
             </div>
